@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css" integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh" crossorigin="anonymous">
+
+    <title>Api Consulta tiempo</title>
+    <style>
+        .jumbotron{
+            background: url( https://freefrontend.com/assets/img/css-weather-icons/Animated-Weather-Icons.gif) no-repeat  center;
+            background-size: 100% ;
+            height: 45rem;
+        }
+        .texto-blanco{
+            color:aliceblue;
+        }
+        .form-inline{
+            margin-left: 15.5rem;
+        }
+        .respuestas{
+            background-color: aliceblue;
+            opacity: 0.8;
+            border-radius: 15px;
+            display: inline-block;
+            width: 30em;
+            height: 31.5em;
+        }
+        .mapa{
+            opacity: 0.95;
+            border-radius: 15px;
+            display: inline-block;
+        }
+        .bloque_respuesta .info_ciudad{
+            margin-left: 10rem;
+        }
+  
+
+    </style>
+</head>
+<body>
+    <div class="jumbotron">
+        <div class="container">
+          <h1 class="display-4 texto-blanco text-center ">Conoce el clima en tu ciudad</h1>
+          <form class="form-inline">
+            <div class="form-group mb-2 ">
+                <h1><span class="badge badge-info ">Ingresa tu ciudad</span></h1>
+            </div>
+            <div class="form-group mx-sm-3 mb-2">
+              <input class="form-control" id="ciudad" placeholder="Ciudad">
+            </div>
+            <button type="submit" class="btn btn-consulta btn-info mb-2">Consulta</button>
+          </form>
+                <div class="row bloque_respuesta">
+                    <div class="col-2 mapa_ciudad">
+                    </div>
+                    <div class="col-8 info_ciudad">     
+                    </div>
+                    <div class="como_llegar">     
+                    </div>
+                </div>
+            </div>
+      </div>
+      <script src="https://code.jquery.com/jquery-3.4.1.min.js" integrity="sha256-CSXorXvZcTkaix6Yvo6HppcZGetbYMGWSFlBw8HfCJo=" crossorigin="anonymous"></script>
+      <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+      <script>
+/*
+          function mostrar_ubicacion_actual(ub){
+              console.log(ub);
+                var latitud_ahora=ub.coords.latitude;
+                var longitud_ahora=ub.coords.longitude;
+              //debugger 
+              //debugeo para acceder a ub en consola
+              var como_llegar=`
+                        <iframe src="https://embed.waze.com/iframe?zoom=12&lat=45.6906304&lon=-120.810983"
+                        width="300" height="400"></iframe>`
+          }
+          navigator.geolocation.getCurrentPosition(mostrar_ubicacion_actual);
+*/
+
+          $(document).ready(function() {
+            $('form').on('submit',function(ev){ 
+                ev.preventDefault();          
+              
+            var nombre_ciudad=$('#ciudad').val();
+                $.get(
+                    `http://api.openweathermap.org/data/2.5/weather?q=${nombre_ciudad}&&appid=fec7c93ddb5ad0c9ab2f6859b04eb1cd`,
+                    
+                     function(res) {
+                        // your code here (build up your url)
+                        var nombre = res.name;
+                        var temperatura_kelvin = res.main.temp;
+                        var temperatura_celsius= Math.round(temperatura_kelvin-273);
+                        var velocidad_viento = res.wind.speed;
+                        var sensacion_termica =Math.round(res.main.feels_like-273);
+                        var latitud=res.coord.lat;
+                        var longitud = res.coord.lon;
+
+                        
+                        var info_ciudad=`
+                        <div class="respuestas col-6">     
+                   
+                            <h1 class="text-capitalize  text-center">${nombre}</h1>
+                            <h5>Temperatura hoy:</h5>
+                            <div><ul><li>${temperatura_celsius} °C</li></ul></div>
+                            <h5>Sensación térmica</h5>
+                            <div><ul><li>${sensacion_termica} °C</li></ul></div>
+                            <h5>Velocidad viento</h5>
+                            <div><ul><li>${velocidad_viento}</li></ul></div>
+                            <h5>Ubicación</h5>
+                            <div><ul><li>${latitud}${longitud}</li></ul></div> 
+                        </div>
+                        `
+                        var ubicacion=`
+
+                        <div class="mapa col-5">
+                            <iframe class="iframe mapa" src="https://maps.google.com/?ll=${latitud},${longitud}&z=14&t=m&output=embed" height="500" frameborder="0" style="border:0" allowfullscreen></iframe>
+                        </div>
+                        `
+
+  
+                        $('.info_ciudad').html(info_ciudad);
+                        $('.mapa_ciudad').html(ubicacion);
+                       
+                    }, 'json');
+                // don't forget to return false so the page doesn't refresh
+                return false;
+              }) ;
+        });
+
+      </script>
+</body>
+</html>
